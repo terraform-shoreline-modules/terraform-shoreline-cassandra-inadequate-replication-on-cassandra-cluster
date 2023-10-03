@@ -1,0 +1,178 @@
+{
+  "name": "inadequate_replication_on_cassandra_cluster",
+  "description": "Inadequate replication refers to a situation where there is an insufficient replication factor or replication strategy implemented on a distributed system like a Cassandra cluster. This can result in data loss if one or more nodes fail. Without adequate replication, the data stored on the failed nodes cannot be retrieved, leading to a substantial data loss. This incident requires immediate attention to ensure that the replication factor and strategy are optimized to prevent data loss in the future.",
+  "params": [
+    {
+      "name": "NODE_IP",
+      "value": ""
+    },
+    {
+      "name": "CASSANDRA_HOST",
+      "value": ""
+    },
+    {
+      "name": "CASSANDRA_USERNAME",
+      "value": ""
+    },
+    {
+      "name": "CASSANDRA_PASSWORD",
+      "value": ""
+    },
+    {
+      "name": "TABLE_NAME",
+      "value": ""
+    },
+    {
+      "name": "KEYSPACE_NAME",
+      "value": ""
+    },
+    {
+      "name": "DATA_CENTER",
+      "value": ""
+    },
+    {
+      "name": "DESIRED_REPLICATION_FACTOR",
+      "value": ""
+    },
+    {
+      "name": "HOST_NAME",
+      "value": ""
+    },
+    {
+      "name": "K8S_CLUSTER_NAME",
+      "value": ""
+    },
+    {
+      "name": "NAMESPACE",
+      "value": ""
+    }
+  ],
+  "cells": [
+    {
+      "name": "cell_1",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Inadequate Replication on Cassandra Cluster\nInadequate replication refers to a situation where there is an insufficient replication factor or replication strategy implemented on a distributed system like a Cassandra cluster. This can result in data loss if one or more nodes fail. Without adequate replication, the data stored on the failed nodes cannot be retrieved, leading to a substantial data loss. This incident requires immediate attention to ensure that the replication factor and strategy are optimized to prevent data loss in the future."
+    },
+    {
+      "name": "cell_2",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the number of nodes in the Cassandra cluster"
+    },
+    {
+      "name": "cell_3",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool status`"
+    },
+    {
+      "name": "cell_4",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the replication factor of the affected keyspace"
+    },
+    {
+      "name": "cell_5",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool getendpoints ${KEYSPACE_NAME} ${KEY}`"
+    },
+    {
+      "name": "cell_6",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the replication strategy of the affected keyspace"
+    },
+    {
+      "name": "cell_7",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool describecluster | grep ${KEYSPACE_NAME}`"
+    },
+    {
+      "name": "cell_8",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the logs for any warnings or errors related to inadequate replication"
+    },
+    {
+      "name": "cell_9",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -i \"inadequate replication\" /var/log/cassandra/system.log`"
+    },
+    {
+      "name": "cell_10",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the affected node(s)"
+    },
+    {
+      "name": "cell_11",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool status ${NODE_IP}`"
+    },
+    {
+      "name": "cell_12",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the status of the affected data center(s)"
+    },
+    {
+      "name": "cell_13",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool status --dc ${DATA_CENTER}`"
+    },
+    {
+      "name": "cell_14",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the health of the Cassandra cluster"
+    },
+    {
+      "name": "cell_15",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `nodetool health`"
+    },
+    {
+      "name": "cell_16",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the consistency level of the affected queries"
+    },
+    {
+      "name": "cell_17",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -r \"consistency\" /etc/cassandra/`"
+    },
+    {
+      "name": "cell_18",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Check the cluster and node configuration files for any replication-related issues"
+    },
+    {
+      "name": "cell_19",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "(host | host_name=$HOST_NAME) union (pod | k8s_cluster_name=$K8S_CLUSTER_NAME | namespace=$NAMESPACE) | `grep -r \"replication\" /etc/cassandra/`"
+    },
+    {
+      "name": "cell_20",
+      "type": "MARKDOWN",
+      "enabled": true,
+      "content": "## Increase the replication factor: Increase the number of replicas for each data center in the Cassandra cluster. This ensures that multiple copies of the data are stored across different nodes, which reduces the risk of data loss if a node fails."
+    },
+    {
+      "name": "cell_21",
+      "type": "OP_LANG",
+      "enabled": true,
+      "content": "host | host_name=$HOST_NAME | invoke_change_replication($CASSANDRA_HOST, $CASSANDRA_USERNAME, $CASSANDRA_PASSWORD, $TABLE_NAME, $KEYSPACE_NAME, $DESIRED_REPLICATION_FACTOR)"
+    }
+  ]
+}
